@@ -113,3 +113,119 @@ public class Main {
 # If the "compareTo()" method is implemented in a class, what is the need to implement the "equals" method as well?
 You need compareTo() for ordering. You need equals() (and hashCode()) for equality checks, especially with hash-based collections.  You often need both, especially when using sorted collections. equals() method in Object class by deafult checks for reference eqiality rather than contens.
 
+# Why would you use a final class when its methods cannot be overridden?
+For security, immutabilty. 
+
+public final class Utility {
+    public static int add(int a, int b) {
+        return a + b;
+    }
+}
+This Utility class is meant to be used as a helper class, and preventing inheritance ensures that its behavior remains predictable. All methods of a final class are final by default. 
+
+# Can changes be made to a final or immutable class using reflection in Java?
+You can use Java Reflection (java.lang.reflect) to modify private fields, even if they are final as well as static final.
+This is possible because reflection allows you to override access restrictions.
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+
+import java.lang.reflect.Field;
+
+class Constants {
+    public static final String MESSAGE = "Hello, World!";
+}
+
+public class ModifyFinalStatic {
+    public static void main(String[] args) throws Exception {
+        Field field = Constants.class.getDeclaredField("MESSAGE");
+        field.setAccessible(true);
+
+        // Remove the 'final' modifier
+        Field modifiersField = Field.class.getDeclaredField("modifiers");
+        modifiersField.setAccessible(true);
+        modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+
+        // Change the constant
+        field.set(null, "Hacked!");
+
+        // Verify the change
+        System.out.println(Constants.MESSAGE);  // Output: Hacked!
+    }
+}
+
+# Can We Modify a Final Class?
+We cannot extend a final class, but we can modify its behavior using reflection.
+We cannot remove the final modifier from a class, but we can change fields dynamically.
+
+# why reflection was introduced in java
+1. Runtime Inspection of Classes and Objects
+Example: Listing all methods of a class at runtime:
+
+import java.lang.reflect.Method;
+
+public class ReflectionExample {
+    public static void main(String[] args) {
+        Class<?> clazz = String.class; // Get metadata of String class
+
+        // Print all method names in String class
+        for (Method method : clazz.getDeclaredMethods()) {
+            System.out.println(method.getName());
+        }
+    }
+}
+
+2. Accessing Private Members for Testing, Serialization
+3. Dynamic Object Creation (No Hardcoded Class Name) eg: Used in dependency injection (spring), serialization (java)
+public class DynamicInstance {
+    public static void main(String[] args) throws Exception {
+        Class<?> clazz = Class.forName("java.lang.String");
+        Object obj = clazz.getConstructor().newInstance(); // Create instance dynamically
+        System.out.println("Created object: " + obj.getClass().getName());
+    }
+}
+4. ORM (Hibernate, JPA) → Map Java objects to database tables without writing explicit SQL queries.
+   Reflection in Spring for dependency injection
+   public class A{
+      public void doSomething(){}
+   }
+
+   public class B{
+      private A a;
+      setA(A a){
+         this.a = a;
+      }
+
+      public void doWork(){
+         a.doSomething();
+      }
+   }
+
+   public class SpringMain{
+      public static void main(String arg[]){
+         Class<?> aClazz = Class.forName("A");
+         Object aInstance = aClazz.getDeclaredConstructor().newInstance(); //dynamically created A class instance
+         Class<?> bClazz = Class.forName("B");
+         Object bInstance = bClazz.getDeclaredConstructor().newInstance();
+
+         Method setter = bClazz.getMethod("setA", A.class);
+         setter.invoke(bInstance, aInstance);
+
+         Method doWork = bClazz.getMethod("doWork");
+         doWork.invoke(bInstance);
+      }
+   }
+
+# Implement your jackson like serializer and deserializer
+
+# What is the purpose of the "rt.jar" file in Java?
+rt.jar (short for "runtime.jar") is a core Java library file that contains all the built-in Java classes required to run Java applications.
+
+# Explain the significance of the Manifest file in Java.
+MANIFEST.MF is a special metadata file inside JAR which provides config details about jar's content.
+Main-Class ::::::::::::::	Defines the entry point (for running JARs)
+Class-Path ::::::::::::::	Specifies dependencies
+Implementation-Version ::	Provides version info
+Sealed ::::::::::::::::::	Ensures package integrity
+Signature :::::::::::::::	Enables secure JARs
+
