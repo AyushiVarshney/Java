@@ -229,3 +229,133 @@ Implementation-Version ::	Provides version info
 Sealed ::::::::::::::::::	Ensures package integrity
 Signature :::::::::::::::	Enables secure JARs
 
+# What is an Anonymous Object in Java
+is created without assigning it to a reference variable. It is usually used when an object is needed only once.
+new Car().drive(); 
+
+# What is a covariant return type in method overriding, and does it support overloading as well?
+No for Overloaing as overloading is based on method name and parameters not on return type
+
+public class Parent{
+   Parent callMe(){}
+   int printMe(){}
+}
+
+public class Chind extends Parent{
+   Child callMe(){} //here callMe method is being overriden and it can return subtype (covariant return type)
+   double printMe(){} //this is not allowed. For overriding return should also be either same or subtype
+}
+
+# What are the advantages and disadvantages of using log4j for logging in Java?
+Highly configurable (provides confg file), multiple appenders, thread-safe. Provides diff log levels.
+Can slow your app if not config properly (like file based logging)
+example of log4j.xml file
+
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Properties>
+        <Property name="LOG_PATTERN">%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %logger{36} - %msg%n</Property>
+        <Property name="LOG_FILE">logs/app.log</Property>
+    </Properties>
+
+    <Appenders>
+        <!-- Console Appender (Logs to Console) -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${LOG_PATTERN}" />
+        </Console>
+
+        <!-- File Appender (Logs to a File) -->
+        <RollingFile name="FileLogger" fileName="${LOG_FILE}"
+                     filePattern="logs/app-%d{yyyy-MM-dd}.log.gz">
+            <PatternLayout>
+                <Pattern>${LOG_PATTERN}</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+            </Policies>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <!-- Set logging levels for specific packages -->
+        <Logger name="com.example" level="DEBUG" additivity="false">
+            <AppenderRef ref="FileLogger" />
+        </Logger>
+
+        <!-- Root Logger (Default Logging Behavior) -->
+        <Root level="INFO">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="FileLogger"/>
+        </Root>
+    </Loggers>
+</Configuration>
+
+# what is the difference between dependency and dependencymanagement
+dependency tag will immedietly loads the files to classpath. And if we add any dependency in dependencymanagement tag then we dont need to define version of those dependencies in child module hence, all modules will use same versions of those dependencies.
+
+# In what situations would you use an inner class in Java
+In what situations would you use an inner class in Java and when we have tight coupling example Car has Engine so Engine could be inner class for Car.
+
+# What are the access modifiers available in Java?
+private: Accessible within class (Not applicate for top level classes as we can only have default/public outer classes)
+default: Accessible within package
+protected: Accessible within package and subclasses in different package (Not applicate for top level classes)
+public: Accessible from everywhere
+
+# what are some common annotation used in Jackson Serialization
+@JsonIgnore: That field wont be serialized
+@JsonProperty: To change field name
+@JsonFormat: to specify date format
+
+# what are some common annotation used in Jackson DeSerialization
+
+# How do you serialize immutable objects.
+By defualt no arg constructor is required but we can create custom also if there is no default constructor in class which you are serializing, for immutable objects we need @JsonCreator on the constructor which we have createed and @JsonProperty on parameters passed in contructors.
+
+# What is an Annotation in Java, and how do you create a custom annotation?
+Annotations provide metadata that provides extra info about code behaviour.
+
+@Retention(RetentionPolicy.RUNTIME)  // Available at runtime for reflection
+@Target(ElementType.METHOD)          // Can only be applied to methods
+@interface LogExecutionTime {
+    String value() default "Execution Time Logger";  // Annotation element with default value
+}
+
+# What is the meaning of the Serial Version UID in Java Serialization?
+Allows backward compatibily: If we dont provide seraialId then automatically in id is generated based on class. and if later we do any changes to this class then JVM will generate diff serialId then we will get InvaliCLassException on deserializing.
+
+# Explain the difference between the "path" and "classpath" variables in Java.
+path: is used to find java executables like java, javac
+classpath: is used for locating .class files and jars
+
+# JVM memory
+
+├── Method Area (Class Metadata, Static Variables, Constants)
+├── Heap Memory (Objects, Instance Variables)
+├── Stack Memory (Method Calls, Local Variables, References)
+├── PC Register (Current Instruction Address)
+└── Native Method Stack (C/C++ Code Execution)
+
+# How is Exception Handling implemented in inheritance in Java, and what are the rules associated with it?
+Method in subclass should not throw broader checked exception. However, unchecked exceptions can be thrown freely.
+
+class Parent {
+    void show() throws IOException { // Checked Exception (IOException)
+        System.out.println("Parent method");
+    }
+}
+
+class Child extends Parent {
+    @Override
+    void show() throws Exception { // ❌ Broader Exception (Exception is parent of IOException)
+        System.out.println("Child method");
+    }
+
+    @Override
+    void show() throws java.io.FileNotFoundException { // ✅ Narrower Exception (Subclass of IOException)
+        System.out.println("Child method");
+    }
+}
+
+# Define Data Hiding in the context of inheritance in Java.
+In inheritance, data hiding means that a subclass does not inherit private fields from its parent class, even though it inherits the methods that operate on those fields.
