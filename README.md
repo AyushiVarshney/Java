@@ -403,3 +403,50 @@ class Car{
    }
 }
 
+# Internal Working of TreeSet
+Treemap uses Red black tree which is self balancing binary search tree. The tree performs binary search to find coorect position for element being inserted or deleted.
+No null values are allowed in TreeSet. Uses compareTo method for natural Ordreing of elements.
+
+Insertion O(logn)
+Deletion O(logn)
+Search O(logn)
+
+TreeSet<Integer> set = new TreeSet<>(); // 1 2 3 4
+TreeSet<Integer> set = new TreeSet<>(Comparator.reverseOrder());//4 3 2 1
+
+# Ways to call Functional Interface abstract method
+interface MyInterface{
+ public void print();
+}
+1. Using Concrete class and providing implementation (Normal)
+2. Using Anonymous Class
+3. Using Lambda
+4. Using Method Referencing
+
+class Main{
+   public static void main(String arg[]){
+      MyInterface my = new MyInterface({
+         @Override
+         public void print(){
+            System.out.println("hello");
+         }
+      });
+      my.print(); //anonymous class
+
+      MyInterface my = () -> System.out.println("hello");
+      my.print(); //using lambda *Note : Lambda can only be used if Interface is having only one abstract method.
+
+      public static void print(){ //for static methods
+         System.out.println("hello");
+      }
+
+      MyInterface my = Main::print; //using method referencing. **Note: we have assigned a static method to functional Interface which is allowed in method referencing.
+
+      my.print();
+
+      //If print method implementation is in another class then we can method referencing with instance vriable
+      //example print method is in Test Class and object name is test
+      MyInterface my = test::print;
+      my.print();
+   }
+}
