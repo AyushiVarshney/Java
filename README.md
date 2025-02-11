@@ -359,3 +359,47 @@ class Child extends Parent {
 
 # Define Data Hiding in the context of inheritance in Java.
 In inheritance, data hiding means that a subclass does not inherit private fields from its parent class, even though it inherits the methods that operate on those fields.
+
+# What is IS-A and HAS-A (Association, Aggregation and Composition) in Object Oriented Programming.
+IS-A : IS-A relationship is created in parent child relationship. Class A extends B
+Association (has-a): is created when two objects can exist independenty. example Student and Teacher
+
+class Student{
+   private String name;
+   Student(){}
+}
+
+class Teacher{
+   private String name;
+   Teacher(){}
+   public void teaches(Student student){} //Teacher teaches Student but both teacher and student can exist independently.
+}
+
+Aggregation(has-a) (Dependency Injection): is created when parent contains child, and child can exist separately
+
+class ServiceLayer{
+   private RepoLayer repoLayer; //S
+   
+   @Autowired
+   public ServiceLayer(RepoLayer repoLayer){ 
+      this.repoLayer = repoLayer;
+   }
+}
+
+class RepoLayer{
+   public RepoLayer(){} // RepoLayer can exist independently
+}
+
+Composition(part-of): is created when child can not exist separately. when parent is destroyed, child is also destroyed
+
+class Engine{
+   public Engine(){}
+}
+
+class Car{
+   private Engine engine;
+   public Car(){
+      engine = new Engine(); // Engine is created inside Car
+   }
+}
+
