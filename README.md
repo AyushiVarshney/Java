@@ -470,13 +470,13 @@ class Main{
 ```
 # Streams groupingBy and partitioningBy
 partitioningBy is a special case of grouping by which splits the collection into two list false and true based on condition and returns Map<Boolean, List<T>>
-
+```Java
 Feature      	           groupingBy()	                              partitioningBy()
 Key Type	                Any K (String, Integer, Enum, etc.)	       Always Boolean
 Output Map Type	         Map<K, List<T>>	                           Map<Boolean, List<T>>
 Number of Groups	        Multiple	                                  Exactly Two
 Use Case	                Categorizing data into many groups	        Splitting into true/false groups
-```Java
+
 class Employee {
    String name;
    int salary;
