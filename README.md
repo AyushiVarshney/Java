@@ -177,6 +177,7 @@ public class ReflectionExample {
 
 2. Accessing Private Members for Testing, Serialization
 3. Dynamic Object Creation (No Hardcoded Class Name) eg: Used in dependency injection (spring), serialization (java)
+   
 public class DynamicInstance {
     public static void main(String[] args) throws Exception {
         Class<?> clazz = Class.forName("java.lang.String");
@@ -184,8 +185,12 @@ public class DynamicInstance {
         System.out.println("Created object: " + obj.getClass().getName());
     }
 }
-4. ORM (Hibernate, JPA) → Map Java objects to database tables without writing explicit SQL queries.
+
+5. ORM (Hibernate, JPA) → Map Java objects to database tables without writing explicit SQL queries.
+   
    Reflection in Spring for dependency injection
+   
+   ```Java
    public class A{
       public void doSomething(){}
    }
@@ -200,7 +205,7 @@ public class DynamicInstance {
          a.doSomething();
       }
    }
-
+   
    public class SpringMain{
       public static void main(String arg[]){
          Class<?> aClazz = Class.forName("A");
@@ -215,6 +220,7 @@ public class DynamicInstance {
          doWork.invoke(bInstance);
       }
    }
+```
 
 # Implement your jackson like serializer and deserializer
 
