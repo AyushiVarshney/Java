@@ -482,26 +482,26 @@ class Employee {
    int salary;
    int experience;
 }
-Usecase about partitioningBy: Find two lists of EMployees having salary larger than 25000 and other list having smaller salaries
+//Usecase about partitioningBy: Find two lists of EMployees having salary larger than 25000 and other list having smaller salaries
 
 class PartitioningBy {
    Map<Boolean, List<Employee>> map = list.stream().collect(Collectors.partitioningBy(l->l.salary() > 25000));
    
-   Result in map : Key     Value
-                   true    Employee List having salary greater than 25000
-                   false   Employee list having salary less than equal to 25000
+   //Result in map : Key     Value
+                   //true    Employee List having salary greater than 25000
+                   //false   Employee list having salary less than equal to 25000
    
-   Suppose if we want only Employee names instaed of Employee
+   //Suppose if we want only Employee names instaed of Employee
    
    Map<Boolean, List<String>> map = list.stream().collect(Collectors.partitioningBy(l -> l.salary() > 25000, 
       Collectors.mapping(l->l.name(), Collectors.toList())));
    
-   Suppose we want count of Employees
+   //Suppose we want count of Employees
    
    Map<Boolean, Long> map = list.stream().collect(Collectors.partitioningBy( l -> l.salary() > 25000, Collectors.counting())); 
 }
 
-Use Case : if we want to categorize in more than two sets - Find Emplyoyess having 0 to 3 years of exp, 4 to 6 years of exp and above t years
+//Use Case : if we want to categorize in more than two sets - Find Emplyoyess having 0 to 3 years of exp, 4 to 6 years of exp and above t years
 
 class GroupingBy {
    Map<String, List<Employee>> map = list.stream().collect(Collectors.groupingBy(l -> {
@@ -513,10 +513,10 @@ class GroupingBy {
          return "Senior Level";
    }));
 
-   Result in map : Key              Value
-                   Entry Level      Employee List having experience less than equal to 3 years
-                   Mid Level        Employee list having salary less than equal to 6 years
-                   Senior Level     Employee list having salary greater than 6 years
+   //Result in map : Key              Value
+                   //Entry Level      Employee List having experience less than equal to 3 years
+                   //Mid Level        Employee list having salary less than equal to 6 years
+                   //Senior Level     Employee list having salary greater than 6 years
    
 }
 ```
