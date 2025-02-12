@@ -344,12 +344,13 @@ path: is used to find java executables like java, javac
 classpath: is used for locating .class files and jars
 
 # JVM memory
-
+```Java
 ├── Method Area (Class Metadata, Static Variables, Constants)
 ├── Heap Memory (Objects, Instance Variables)
 ├── Stack Memory (Method Calls, Local Variables, References)
 ├── PC Register (Current Instruction Address)
 └── Native Method Stack (C/C++ Code Execution)
+```
 
 # How is Exception Handling implemented in inheritance in Java, and what are the rules associated with it?
 Method in subclass should not throw broader checked exception. However, unchecked exceptions can be thrown freely.
