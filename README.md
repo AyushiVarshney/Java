@@ -27,6 +27,7 @@ String methods like isBlank, strip(). Allowed var for lamba expression parameter
 # Can the "main()"/static method be overridden 
 No, static method can not be overridden since they do not belong to instance. Static always belong to class. If we override static methods that become method hiding.
 
+```Java
 class Parent {
     public static void myMethod() {
         System.out.println("Parent's static method");
@@ -51,6 +52,7 @@ public class Main {
         pc.myMethod(); // Output: Parent's static method (Hiding, not Overriding)
     }
 }
+```
 
 # Can the "main" method be declared as "final" in Java
 Yes, we can but this is not of any use because static method anyways can not be overridden.
@@ -58,6 +60,7 @@ Yes, we can but this is not of any use because static method anyways can not be 
 # Explain the concept of object cloning in Java.
 Creation of exact copy of object. Class must implement Cloneable interface otherwise CloneNotSupportedException. By default shallow copy of Object is created.
 
+```Java
 class MyObject implements Cloneable {
     int x;
     OtherObject obj; // Reference to another object, in shallow copy ojb will share same memory
@@ -109,6 +112,7 @@ public class Main {
         System.out.println(obj2.obj.name); // Output: Modified (Shared!)
     }
 }
+```
 
 # If the "compareTo()" method is implemented in a class, what is the need to implement the "equals" method as well?
 You need compareTo() for ordering. You need equals() (and hashCode()) for equality checks, especially with hash-based collections.  You often need both, especially when using sorted collections. equals() method in Object class by deafult checks for reference eqiality rather than contens.
@@ -116,17 +120,21 @@ You need compareTo() for ordering. You need equals() (and hashCode()) for equali
 # Why would you use a final class when its methods cannot be overridden?
 For security, immutabilty. 
 
+```Java
 public final class Utility {
     public static int add(int a, int b) {
         return a + b;
     }
 }
+```
+
 This Utility class is meant to be used as a helper class, and preventing inheritance ensures that its behavior remains predictable. All methods of a final class are final by default. 
 
 # Can changes be made to a final or immutable class using reflection in Java?
 You can use Java Reflection (java.lang.reflect) to modify private fields, even if they are final as well as static final.
 This is possible because reflection allows you to override access restrictions.
 
+```Java
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
@@ -153,7 +161,7 @@ public class ModifyFinalStatic {
         System.out.println(Constants.MESSAGE);  // Output: Hacked!
     }
 }
-
+```
 # Can We Modify a Final Class?
 We cannot extend a final class, but we can modify its behavior using reflection.
 We cannot remove the final modifier from a class, but we can change fields dynamically.
@@ -162,6 +170,7 @@ We cannot remove the final modifier from a class, but we can change fields dynam
 1. Runtime Inspection of Classes and Objects
 Example: Listing all methods of a class at runtime:
 
+```Java
 import java.lang.reflect.Method;
 
 public class ReflectionExample {
@@ -174,6 +183,7 @@ public class ReflectionExample {
         }
     }
 }
+```
 
 2. Accessing Private Members for Testing, Serialization
 3. Dynamic Object Creation (No Hardcoded Class Name) eg: Used in dependency injection (spring), serialization (java)
@@ -190,7 +200,7 @@ public class DynamicInstance {
    
    Reflection in Spring for dependency injection
    
-   ```Java
+```Java
    public class A{
       public void doSomething(){}
    }
@@ -221,7 +231,6 @@ public class DynamicInstance {
       }
    }
 ```
-
 # Implement your jackson like serializer and deserializer
 
 # What is the purpose of the "rt.jar" file in Java?
@@ -241,7 +250,7 @@ new Car().drive();
 
 # What is a covariant return type in method overriding, and does it support overloading as well?
 No for Overloaing as overloading is based on method name and parameters not on return type
-
+```Java
 public class Parent{
    Parent callMe(){}
    int printMe(){}
@@ -251,12 +260,12 @@ public class Chind extends Parent{
    Child callMe(){} //here callMe method is being overriden and it can return subtype (covariant return type)
    double printMe(){} //this is not allowed. For overriding return should also be either same or subtype
 }
-
+```
 # What are the advantages and disadvantages of using log4j for logging in Java?
 Highly configurable (provides confg file), multiple appenders, thread-safe. Provides diff log levels.
 Can slow your app if not config properly (like file based logging)
 example of log4j.xml file
-
+```Java
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="WARN">
     <Properties>
@@ -295,7 +304,7 @@ example of log4j.xml file
         </Root>
     </Loggers>
 </Configuration>
-
+```
 # what is the difference between dependency and dependencymanagement
 dependency tag will immedietly loads the files to classpath. And if we add any dependency in dependencymanagement tag then we dont need to define version of those dependencies in child module hence, all modules will use same versions of those dependencies.
 
@@ -320,13 +329,13 @@ By defualt no arg constructor is required but we can create custom also if there
 
 # What is an Annotation in Java, and how do you create a custom annotation?
 Annotations provide metadata that provides extra info about code behaviour.
-
+```Java
 @Retention(RetentionPolicy.RUNTIME)  // Available at runtime for reflection
 @Target(ElementType.METHOD)          // Can only be applied to methods
 @interface LogExecutionTime {
     String value() default "Execution Time Logger";  // Annotation element with default value
 }
-
+```
 # What is the meaning of the Serial Version UID in Java Serialization?
 Allows backward compatibily: If we dont provide seraialId then automatically in id is generated based on class. and if later we do any changes to this class then JVM will generate diff serialId then we will get InvaliCLassException on deserializing.
 
@@ -344,7 +353,7 @@ classpath: is used for locating .class files and jars
 
 # How is Exception Handling implemented in inheritance in Java, and what are the rules associated with it?
 Method in subclass should not throw broader checked exception. However, unchecked exceptions can be thrown freely.
-
+```Java
 class Parent {
     void show() throws IOException { // Checked Exception (IOException)
         System.out.println("Parent method");
@@ -362,14 +371,14 @@ class Child extends Parent {
         System.out.println("Child method");
     }
 }
-
+```
 # Define Data Hiding in the context of inheritance in Java.
 In inheritance, data hiding means that a subclass does not inherit private fields from its parent class, even though it inherits the methods that operate on those fields.
 
 # What is IS-A and HAS-A (Association, Aggregation and Composition) in Object Oriented Programming.
 IS-A : IS-A relationship is created in parent child relationship. Class A extends B
 Association (has-a): is created when two objects can exist independenty. example Student and Teacher
-
+```Java
 class Student{
    private String name;
    Student(){}
@@ -408,7 +417,7 @@ class Car{
       engine = new Engine(); // Engine is created inside Car
    }
 }
-
+```
 # Internal Working of TreeSet
 Treemap uses Red black tree which is self balancing binary search tree. The tree performs binary search to find coorect position for element being inserted or deleted.
 No null values are allowed in TreeSet. Uses compareTo method for natural Ordreing of elements.
@@ -421,6 +430,7 @@ TreeSet<Integer> set = new TreeSet<>(); // 1 2 3 4
 TreeSet<Integer> set = new TreeSet<>(Comparator.reverseOrder());//4 3 2 1
 
 # Ways to call Functional Interface abstract method
+```Java
 interface MyInterface{
  public void print();
 }
@@ -456,7 +466,7 @@ class Main{
       my.print();
    }
 }
-
+```
 # Streams groupingBy and partitioningBy
 partitioningBy is a special case of grouping by which splits the collection into two list false and true based on condition and returns Map<Boolean, List<T>>
 
@@ -465,7 +475,7 @@ Key Type	                Any K (String, Integer, Enum, etc.)	       Always Boole
 Output Map Type	         Map<K, List<T>>	                           Map<Boolean, List<T>>
 Number of Groups	        Multiple	                                  Exactly Two
 Use Case	                Categorizing data into many groups	        Splitting into true/false groups
-
+```Java
 class Employee {
    String name;
    int salary;
@@ -508,3 +518,4 @@ class GroupingBy {
                    Senior Level     Employee list having salary greater than 6 years
    
 }
+```
