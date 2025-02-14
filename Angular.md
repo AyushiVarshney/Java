@@ -17,7 +17,7 @@ is a special class that lets you extend behaviour of elements in DOM.
 
 We need custom directive to encapsulate reusable behaviours, enhance user interaction, change existing elements dynamically.
 ```ts
-import {ElementRef, Directive, Input, HostListener, Renderer2} from '@anhular/core';
+import {ElementRef, Directive, Input, HostListener, Renderer2} from '@angular/core';
 
 @Directive({
       selector: '[appHighlightOnHover]'
@@ -45,15 +45,142 @@ export class HighlightDirective {
       templateUrl: './app-my-app.component.html', or template: `<p appHighlightOnHover> This is some text</>`,
       styleUrls: ['./app-my-app.component.scss']
 })
-//we can also pass diff color `<p appHighlightOnHover hightlightColor = 'skyblue'> This is some text</>`,
+//we can also pass diff color `<p appHighlightOnHover [hightlightColor] = 'skyblue'> This is some text</>`,
 export class MyApp {}
 
 ```
 
 # HostBinding and HostListener
-HostBinding('value') myValue; is exactly the same as [value]="myValue"
+HostBinding('value') myValue used for changing state of host element; is exactly the same as [value]="myValue"
 And
-HostListener('click') myClick(){ } is exactly the same as (click)="myClick()"
+HostListener('click') myClick(){ } is used for listening to event; is exactly the same as (click)="myClick()"
 
 HostBinding and HostListener are written in directives and the other ones (...) and [..] are written inside templates (of components).
-# what is subject, behaviour subject and reply subject
+```ts
+import { Directive, HostBinding, HostListener, Input } from '@angular/core';
+
+@Directive({
+  selector: '[appHoverEffect]',
+})
+export class HoverEffectDirective {
+  
+  @Input() hoverColor: string = 'yellow';  // Default color
+
+  @HostBinding('style.backgroundColor') backgroundColor: string;
+
+  @HostListener('mouseenter') onMouseEnter() {
+    this.backgroundColor = this.hoverColor;  // Change background color on mouse enter
+  }
+
+  @HostListener('mouseleave') onMouseLeave() {
+    this.backgroundColor = null;  // Reset background color on mouse leave
+  }
+}
+```
+
+# what is SimpleChanges in Angular
+Simplechanges is an interface that provides changes in Input properties os component. When angular detect changes in Input property it triggers ngOnChanges hook which receives argument of Type simplechanges which is a map object.
+For example if my component has 2 input propeties , title and message then 
+```ts
+ngOnChanges(changes: SimpleChanges){
+      if(changes['title']){//title has changed}
+      if(changes['message']){//message has changed}
+}
+//Structure of SimpleCHanges
+{
+  title: SimpleChange {
+    previousValue: 'Old Title',
+    currentValue: 'New Title',
+    firstChange: false
+  },
+  message: SimpleChange {
+    previousValue: 'Old Message',
+    currentValue: 'New Message',
+    firstChange: false
+  }
+```
+# What is RxJs
+Its a library for reactive programming using Observables to perform asynchronous tasks. We can use for
+1. Http Calls
+2. State Management (ex : using Ngrx)
+3. Handilng User events
+4. handling real time updates
+```ts
+import {Observable} from 'rxjs';
+
+const observable = new Observable(subscriber => {
+      console.log('Hello from Observable');
+      subscriber.next('Hello');
+      subscriber.next('RxJs');
+      subscriber.complete();
+}); //By default observables are cold. Meaning is there are multiple subscribers, observables will run from start for every subscription
+
+observable.subscribe(value => console.log(value));
+observable.subscribe(value => console.log('I am here too ' + value));
+
+Output: Hello from Observable
+        Hello
+        RxJs
+        Hello from Observable
+        I am here too Hello
+        I am here too RxJs
+
+```
+We can share observables among multiple shared instance(singleton global instance) subscribers (Hot Observables)
+```ts
+const observable = new Observable(subscriber => {
+      console.log('Hello from Observable');
+      subscriber.next('Hello');
+      subscriber.next('RxJs'); //here observable can emit multiple values like hello and rxjs while promise only resolves once and executes immedietly and store resolve function
+      subscriber.complete();
+}).pipe(share());
+observable.subscribe(value => console.log(value));
+observable.subscribe(value => console.log('I am here too ' + value));
+
+Output: Hello from Observable
+        Hello
+        I am here too Hello
+        RxJs
+        I am here too RxJs
+```
+# what is subject, behaviour subject, reply subject and async subject:
+Observables are unicasting and will emit data only when they are subscribed to. Each subscriber has own execution of observer. UseCase: For http calls
+subject, behaviour subject, reply subject and async subject are hot observers. All subscribers share execution.
+
+```ts
+//Subject is both observer and observable
+let mySubject = new Subject<String>();//In observer we have to pass subscriber here which emits values
+mySubject.next('Hello'); //for subject we can do like this. this value will be missed by subscriber as subject has not been subscribed yet. UseCase: For real time updates
+
+//Behaviour Subject: Requires an initial value and stores last emitted value. Late subscribers will not miss emitted value
+//UseCase: For state management (theme setting, user authentication)
+let bS = new BehaviousSubject<String>('Initial');
+bS.subscribe(val => console.log(val)); //Initial
+bs.next('First Update'); //Subscriber 1 receives First Update and behaviour subject store First Update
+bs.next('Second Update');//Subscriber 1 receives Second Update and behaviour subject store Second Update
+
+bs.subscribe(val => console.log('Second' + val)); //immedietly gets Second Update
+bs.next('Third Upadate'); //both subscribers gets Third Update and behaviour subject stores Third Update
+
+//Replay Subject: is like behaviour and also stores multiple previous values
+let rS = new ReplySubject<number>(3);//define how many history to store
+rS.next(1);
+rS.next(2);
+rS.next(3);
+rS.next(4);//1 is deleted and [2,3,4] are stored
+rS.subscribe(val => console.log(val)); // 2 then in next line 3 and in next line 4
+
+//AsyncSubject: Stores last emmitted value. Subcribers will only receive value when complete is called.
+let aS = new AsyncSubject<number>();
+as.subscribe(val => console.log(val));
+
+as.next(1); //subscriber will not receive anything
+as.next(2); //subscriber will not receive anything and 2 will replace 1
+as.next(3); //subscriber will not receive anything and 3 will replace 2
+
+as.complete(); //3 will be printed
+
+as.subscribe(val => console.log(val)); // second subscriber will also receive 3 and 3 will be printed
+```
+
+
