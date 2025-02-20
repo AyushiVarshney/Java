@@ -141,5 +141,54 @@ Resource Usage	Low	Higher (frequent checks)
 Setup	Requires webhook configuration	Simple, no external setup
 Scalability	Better for large projects	May cause strain on Jenkins
 Use Case	When webhooks are supported	For legacy systems or no webhook support
- 
+
+```java
+ +----------+     +--------+     +------------+      +---------+      +-----------+     +---------+      +----------+
+|  Users   |-----| Roles  |-----| User_Roles |------| Tracks  |------| Defect_   |-----| Defects |------| Reports  |
++----------+     +--------+     +------------+      +---------+      | Types   |     +---------+      +----------+
+| user_id  |     | role_id|     | user_role_id|      | track_id|      | defect_  |     | defect_id|      | report_id|
+| username |     | role_name|     | user_id   |      | track_name|      | type_id|     | track_id |      | reported_|
+| first_   |     |          |     | role_id   |      | owner   |      | defect_ |     | milepost |      | by       |
+| name     |     |          |     |           |      | start_  |      | name   |     | defect_ |      | created_ |
+| last_  |     |          |     |           |      | milepost|      |         |     | type_id |      | at       |
+| name     |     |          |     |           |      | end_    |      |         |     | descrip-|      | start_   |
+| email    |     |          |     |           |      | milepost|      |         |     | tion   |      | milepost |
+| phone_   |     |          |     |           |      |         |      |         |     | report-|      | end_     |
+| number   |     |          |     |           |      |         |      |         |     | ed_by  |      | milepost |
+| is_active|     |          |     |           |      |         |      |         |     |         |      | descrip-|
++----------+     +--------+     +------------+      +---------+      +-----------+     +---------+      +----------+
+                                                                                                  |
+                                                                                                  |
+                                                                                                  v
+                                                                                         +-----------------+
+                                                                                         | Report_Defects  |
+                                                                                         +-----------------+
+                                                                                         | report_defect_id|
+                                                                                         | report_id       |
+                                                                                         | defect_id       |
+                                                                                         +-----------------+
+                                                                                                  |
+                                                                                                  |
+                                                                                                  v
+                                                                                         +-----------------+
+                                                                                         | Notifications   |
+                                                                                         +-----------------+
+                                                                                         | notification_id|
+                                                                                         | recipient_id   |
+                                                                                         | defect_id       |
+                                                                                         | message         |
+                                                                                         | sent_at         |
+                                                                                         | notification_type|
+                                                                                         +-----------------+
+                                                                                                  ^
+                                                                                                  |
+                                                                                         +-----------------+
+                                                                                         |   Hierarchy    |
+                                                                                         +-----------------+
+                                                                                         | hierarchy_id   |
+                                                                                         | employee_id    |
+                                                                                         | supervisor_id  |
+                                                                                         | director_id    |
+                                                                                         +-----------------+
+```
  
