@@ -97,3 +97,147 @@ public class LeakyBucketFilter implements Filter { //Filter is servlet filter wh
 ✅ API Gateway filtering reduces backend load
 ✅ Auto-scaling with Kubernetes & Load Balancing for handling spikes
 ```
+
+# Design Instagram
+High Level Design
+```java
+                         ┌──────────────────┐
+                         │  Client (Mobile) │
+                         └────────▲─────────┘
+                                  │
+                                  ▼
+                    ┌──────────────────────────┐
+                    │       API Gateway        │
+                    └─────────┬──────────┬─────┘
+                              │          │
+         ┌──────────────────┐ │          │ ┌──────────────────┐
+         │   User Service   │ │          │ │   Post Service   │
+         └──────────────────┘ │          │ └──────────────────┘
+                              │          │
+         ┌──────────────────┐ │          │ ┌──────────────────┐
+         │  Feed Service    │ │          │ │ Like/Comment Svc │
+         └──────────────────┘ │          │ └──────────────────┘
+                              │          │
+         ┌──────────────────┐ │          │ ┌──────────────────┐
+         │  Notification    │ │          │ │ Messaging (DM)   │
+         │      Service     │ │          │ │  WebSockets      │
+         └──────────────────┘ │          │ └──────────────────┘
+                              │          │
+                         ┌──────────────────┐
+                         │  Storage Service │  (Amazon S3)
+                         └──────────────────┘
+API Gateway: Authentication, Rate limiting and forward request to corressponding service (Apigee for gateway, jwt for authentication and Apigee and Redis for rate limiting)
+UserService: Deals with user registration, follow/unfollow (Springboot, Oracle for storage and redis for session storage)
+FeedService: Deals with generating personalized feed for users (Springboot, keep precomputed cache in Redis and use kafka to subscribe to new feeds)
+PostService: Creation of posts (Springboot, Oracale, Redis for caching)
+LikeCommentService: Delas with user like unlike comment (Springboot, Oracale, and Redis to store likes count)
+NotificationService: Deals with sending notification about like comment follow unfllow, DMs (Kafka)
+Messaging: Deals with group/one to one messaging. (Sockets, Kafka, Pub/sub Redis)
+StorageService: Service which Stores actual media with userid (Amazon S3)
+```
+
+```java
+Database schema
+
+┌──────────────┐         ┌──────────────┐
+│    Users     │         │   Follows    │
+├──────────────┤         ├──────────────┤
+│ id (PK)      │◄──┐     │ id (PK)      │
+│ username     │   ├───► │ follower_id (FK → Users.id) │
+│ email        │   ├───► │ following_id (FK → Users.id) │
+│ password     │   │     │ created_at   │
+│ profile_pic  │   │     └──────────────┘
+│ bio          │   │
+│ created_at   │   │     ┌──────────────┐
+└──────────────┘   │     │    Posts     │
+                   │     ├──────────────┤
+                   ├───► │ id (PK)      │
+                   │     │ user_id (FK → Users.id) │
+                   │     │ media_url    │
+                   │     │ caption      │
+                   │     │ created_at   │
+                   │     └──────────────┘
+                   │
+                   │     ┌──────────────┐
+                   │     │   Hashtags   │
+                   │     ├──────────────┤
+                   ├───► │ id (PK)      │
+                   │     │ name         │
+                   │     └──────────────┘
+                   │
+                   │     ┌────────────────┐
+                   │     │  Post_Hashtags │
+                   │     ├────────────────┤
+                   ├───► │ post_id (FK → Posts.id) │
+                   │     │ hashtag_id (FK → Hashtags.id) │
+                   │     └────────────────┘
+                   │
+                   │     ┌──────────────┐
+                   │     │    Feeds     │
+                   │     ├──────────────┤
+                   ├───► │ user_id (FK → Users.id) │
+                   │     │ post_id (FK → Posts.id) │
+                   │     │ timestamp    │
+                   │     └──────────────┘
+                   │
+                   │     ┌──────────────┐
+                   │     │    Likes     │
+                   │     ├──────────────┤
+                   ├───► │ id (PK)      │
+                   │     │ user_id (FK → Users.id) │
+                   │     │ post_id (FK → Posts.id) │
+                   │     │ created_at   │
+                   │     └──────────────┘
+                   │
+                   │     ┌──────────────┐
+                   │     │  Comments    │
+                   │     ├──────────────┤
+                   ├───► │ id (PK)      │
+                   │     │ user_id (FK → Users.id) │
+                   │     │ post_id (FK → Posts.id) │
+                   │     │ content      │
+                   │     │ created_at   │
+                   │     └──────────────┘
+                   │
+                   │     ┌──────────────┐
+                   │     │ Notifications│
+                   │     ├──────────────┤
+                   ├───► │ id (PK)      │
+                   │     │ user_id (FK → Users.id) │
+                   │     │ type         │
+                   │     │ reference_id │
+                   │     │ seen         │
+                   │     │ created_at   │
+                   │     └──────────────┘
+                   │
+                   │     ┌──────────────┐
+                   │     │  Messages    │
+                   │     ├──────────────┤
+                   ├───► │ id (PK)      │
+                   │     │ sender_id (FK → Users.id) │
+                   │     │ receiver_id (FK → Users.id) │
+                   │     │ content      │
+                   │     │ timestamp    │
+                   │     └──────────────┘
+                   │
+                   │     ┌──────────────┐
+                   │     │    Chats     │
+                   │     ├──────────────┤
+                   ├───► │ id (PK)      │
+                   │     │ user1_id (FK → Users.id) │
+                   │     │ user2_id (FK → Users.id) │
+                   │     │ created_at   │
+                   │     └──────────────┘
+                   │
+                   │     ┌──────────────┐
+                   │     │ Media_Files  │
+                   │     ├──────────────┤
+                   ├───► │ id (PK)      │
+                   │     │ user_id (FK → Users.id) │
+                   │     │ file_url     │
+                   │     │ file_type    │
+                   │     │ created_at   │
+                   │     └──────────────┘
+```
+
+# Design Notificatio System
