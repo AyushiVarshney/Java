@@ -183,4 +183,56 @@ as.complete(); //3 will be printed
 as.subscribe(val => console.log(val)); // second subscriber will also receive 3 and 3 will be printed
 ```
 
+# What is explicit binding (call, apply, bind)
+Process of explicitly setting value os this using call, apply and bind methods
+```ts
+const person = {
+   name: 'Ayushi',
+   age: 25,
+   printPerson: function(gender) {
+      console.log(`${this.name}'s age is ${this.age} and gender is ${gender}`);
+   }
+}
 
+const person2 = {name: 'Parag',age:30};
+person.printPerson.call(person2, 'male');
+
+const bind = printPerson.bind(person, 'female');//bind regturns a function which we have to call
+bind();
+
+//apply is similiar to call, it just takes function arguments as array
+```
+
+# How you can do inheritance in java script
+```ts
+//1. Using Object.create()
+const obj = {
+   name:'Ayushi',
+   print: function(){}
+}
+const obj2 = Object.create(obj);//obj2 will have all properties of obj
+
+//2. Using prototype inheritence
+//every thing in java is objects like array, functions etc and every object in java has prototype
+
+function Document(title, author) {
+   this.title = title;//creating a constructor function
+   this.author = author;
+}
+
+Document.prototype.print = function(){
+   console.log(`${this.title} by ${this.author}`); //document has a function print & each instance will share print rather than a new copy
+}
+
+function PDFDoc(title, author, size){
+   Document.call(this, title, author);//calling parent constructor function
+   this.size = size;
+}
+
+PDFDoc.prototype = Object.create(Document.prototype);//pdfdoc proto is having document proto
+PDFDoc.prototype.contructor = PDFDoc; //giving back pdfdoc its constructor;
+
+const doc = new PDFDoc('The Hobbit', 'Jimmy', 1024);
+doc.print();//PDFDoc is able to access print function which is in Document proto
+
+```
