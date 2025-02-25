@@ -339,6 +339,30 @@ Annotations provide metadata that provides extra info about code behaviour.
 # What is the meaning of the Serial Version UID in Java Serialization?
 Allows backward compatibily: If we dont provide seraialId then automatically in id is generated based on class. and if later we do any changes to this class then JVM will generate diff serialId then we will get InvaliCLassException on deserializing.
 
+# what is serialization vs externalization?
+Serialization is process of converting objects to bytestream (Done by java) slower due to Reflection overhead.
+Externalization give more control what we want to serialize (implment Externalizable interface and override readExternal and writeExternal in which we define what we want to serialize) Example :
+```java
+public class Employee implements Externalizable {
+   int id;
+    String name;
+    int age;
+
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeUTF(name);
+        out.writeInt(id);
+        //not serializing age
+    }
+
+    @Override
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        id = in.readInt();
+        name = in.readUTF();
+    }
+}
+```
+
 # Explain the difference between the "path" and "classpath" variables in Java.
 path: is used to find java executables like java, javac
 classpath: is used for locating .class files and jars
@@ -518,5 +542,136 @@ class GroupingBy {
                    //Mid Level        Employee list having salary less than equal to 6 years
                    //Senior Level     Employee list having salary greater than 6 years
    
+}
+```
+
+
+## Multithreading
+# What is volatile keyword
+Used to ensure visibility of variable when updated accross multiple threads. Thread cache the variables for performance which can lead to stale data issue. voltile makes sure that variable value is always read by main memory
+
+```java
+class SharedResource {
+    static boolean flag = false;
+
+    public static void main(String[] args) {
+        Thread reader = new Thread(() -> {
+            while (!flag) {  // May read stale value
+                // Looping infinitely due to caching
+            }
+            System.out.println("Flag changed!");
+        });
+
+        Thread writer = new Thread(() -> {
+            try { Thread.sleep(1000); } catch (InterruptedException e) {}
+            flag = true;  // Other thread may not see this update
+            System.out.println("Flag updated!");
+        });
+
+        reader.start();
+        writer.start();
+    }
+}
+```
+
+
+
+## Hibernate
+# JPA vs Hibernate
+JPA is abstraction interface while Hibernate is implementation of JPA. Eg save method is abstract in JPA and hibernate will have actual code of this method
+
+# How to create Primary Key in JPA
+using @Id and @GenerateValue() if we want auto increamenting otherwise just use @Id
+
+```java
+   if @GenerateValue(strategy = GenerationType.AUTO) then strategy will be decides based on database. eg for SQL auto increment and sequence generator for Oracle
+      @GenerateValue(strategy = GenerationType.IDENTITY) for mysql autoincrement
+      @GenerateValue(strategy = GenerationType.SEQUENCE) Hibernate automatically creates a sequence named hibernate_sequence, The default allocationSize = 50, meaning 
+                                                         Hibernate will fetch 50 IDs at a time from the sequence. There could be gaps in IDs but performance optimized
+      @GenerateValue(strategy = GenerationType.SEQUENCE) if used with sequencegenerator then employee_sequence will be auto created if spring.jpa.hibernate.ddl-auto=update
+
+      @Entity
+      @SequenceGenerator(name = "emp_seq", sequenceName = "employee_sequence", allocationSize = 1)
+      public class Employee {
+         @Id
+         @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "emp_seq")
+         private Long id;
+      }
+
+//we can also create using UUID for distributed system but it has 32 long key and slow
+```java
+   @Entity
+   public class Employee {
+      @Id
+      @GeneratedValue(generator = "UUID")
+      @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+      private String id;
+   }
+```
+
+
+# How to make composite primary key
+Using @EmbeddedId
+
+```java
+@Embeddable
+public class EmployeePK implements Serializable {
+    private Long empId;
+    private String department;
+
+    // Override equals() and hashCode()
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        EmployeePK that = (EmployeePK) obj;
+        return Objects.equals(empId, that.empId) && Objects.equals(department, that.department);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(empId, department);
+    }
+}
+then use @EmbeddedId in Entity
+@Entity
+public class Employee {
+    @EmbeddedId
+    private EmployeePK id;
+
+    private String name;
+}
+```
+
+# Inheritence in ORM
+```java
+   Strategy                  Pros                	                  Cons	                                          Best Use Case
+   Single Table              Fastest, simple	                       Wastes space(NULL columns)	                    Most cases unless too many unused columns
+   Table per Class	          No NULLs	                              Duplicates common fields, harder queries	      Rarely used, only if all child entities are very different
+   Joined Table	             Best normalization, avoids NULLs	      Requires JOINs (slower queries)	               Large apps with complex relationships
+🚀 Recommendation:
+Use Single Table unless you need a strict normalized structure.
+Use Joined Table for large projects where normalization is important.
+
+@Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "EMP_TYPE", discriminatorType = DiscriminatorType.STRING)
+public class Employee {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String name;
+}
+
+@Entity
+@DiscriminatorValue("MANAGER")
+public class Manager extends Employee {
+    private int teamSize;
+}
+
+@Entity
+@DiscriminatorValue("ENGINEER")
+public class Engineer extends Employee {
+    private String techStack;
 }
 ```
