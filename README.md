@@ -1,4 +1,5 @@
 # JVM Components
+```java
 +-----------------+     +-----------------+               +-----------------+     +-----------------+
 |   Classloader   | --> | Bytecode Verifier| -->          |   Memory Area   | --> | Execution Engine |
 +-----------------+     +-----------------+               +-----------------+     +-----------------+
@@ -21,6 +22,8 @@ into JVM memory         linking process. performs          |     Method Area    
                                                                                          | Garbage          |
                                                                                          | COllector        |
                                                                                          +------------------+
+
+```
 # Key Features introduced in Java 11
 String methods like isBlank, strip(). Allowed var for lamba expression parameters. HttpClientAPI
 
@@ -675,3 +678,9 @@ public class Engineer extends Employee {
     private String techStack;
 }
 ```
+
+# find employee having salary equal to employee salary mark
+WITH mark_salary AS (SELECT salary FROM Employee WHERE name = 'Mark' LIMIT 1)
+SELECT name FROM Employee e INNER JOIN mark_salary m ON e.salary = m.salary;
+
+select name from employee where salary = (select salary from employee where name = 'mark' limit 1);
