@@ -679,8 +679,34 @@ public class Engineer extends Employee {
 }
 ```
 
+# @JoinColumn
+
+@JoinColumn is used to define the foreign key column in an entity.
+✔ Helps in renaming the column and setting constraints (nullable, unique, etc.).
+✔ Without @JoinColumn, JPA assigns a default name like {entity_name}_id.
+✔ Used in One-to-One and Many-to-One relationships.
+
 # find employee having salary equal to employee salary mark
 WITH mark_salary AS (SELECT salary FROM Employee WHERE name = 'Mark' LIMIT 1)
 SELECT name FROM Employee e INNER JOIN mark_salary m ON e.salary = m.salary;
 
 select name from employee where salary = (select salary from employee where name = 'mark' limit 1);
+
+# What changes you have to when migrating from mysql to oracle
+1. Change mysql connector in pom to ojdbc driver
+2. change application.properties config (url, username, password, dialect and driver)
+3. check schema if tables has autoincrement. auto increment need to change to sequence and trigger(if not using hibernate) in oracle
+4. change limit to pagination
+
+# Connection pooling vs Thread pooling
+```java
+// In connection pooling new connection is created everytime to execute query. SPringboot uses default HikariCP to manage connection pool
+spring.datasource.url=jdbc:mysql://localhost:3306/mydb
+spring.datasource.username=root
+spring.datasource.password=admin
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+spring.datasource.hikari.maximum-pool-size=10  # Max 10 connections in the pool (if its not defined default value 10 will be used)
+
+//In thread pooling, a fixed number of threads are created on startup instead of creating new thread everytime
+ExcetorService service = Excetors.newFixedThreadPool(10);
+```
