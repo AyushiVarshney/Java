@@ -1,0 +1,14 @@
+1. Find all customers having multiple orders as well as item name
+order_id	item	amount	customer_id
+1	Keyboard	400	4
+2	Mouse	300	4
+3	Monitor	12000	3
+4	Keyboard	400	1
+5	Mousepad	250	2
+
+2. What is threadlocal
+3. What is the need of finally if we know that code outside try catch block is always gonna execute
+4. what happens if exception is there in finally block, how to handle it
+5. How to handle errors/exceptions in distributed system
+6. Find missing and added elements between two sorted array (optimized way)
+7. 
