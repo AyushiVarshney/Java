@@ -10,6 +10,33 @@ public class MyThread extends Thread {
 }
 ```
 
+# What is volatile keyword
+Used to ensure visibility of variable when updated accross multiple threads. Thread cache the variables for performance which can lead to stale data issue. voltile makes sure that variable value is always read by main memory
+
+```java
+class SharedResource {
+    static boolean flag = false;
+
+    public static void main(String[] args) {
+        Thread reader = new Thread(() -> {
+            while (!flag) {  // May read stale value
+                // Looping infinitely due to caching
+            }
+            System.out.println("Flag changed!");
+        });
+
+        Thread writer = new Thread(() -> {
+            try { Thread.sleep(1000); } catch (InterruptedException e) {}
+            flag = true;  // Other thread may not see this update
+            System.out.println("Flag updated!");
+        });
+
+        reader.start();
+        writer.start();
+    }
+}
+```
+
 # join vs get in CompletableFuture
 .join() method is used to block the current thread execution and retrieve the results when asynchronous computation is complete. It is similar to .get() except that it does not throw checked exceptions.
 
