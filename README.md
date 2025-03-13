@@ -495,6 +495,17 @@ class Main{
    }
 }
 ```
+
+# Perfect Example for understanding where we can replace lamda with method referencing
+```java
+//Here consumer is functional interface which is having only one abstract method
+Consumer<String> consumer = (a) -> System.out.println(a); // this lamba which is implementation of accept method can be replaced with method referencing
+consumer.accept("Ayushi");
+
+Consumer<String> consumer = System.out::print;
+consumer.accept("Ayushi");
+```
+
 # Streams groupingBy and partitioningBy
 partitioningBy is a special case of grouping by which splits the collection into two list false and true based on condition and returns Map<Boolean, List<T>>
 ```Java
