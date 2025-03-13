@@ -10,6 +10,25 @@ public class MyThread extends Thread {
 }
 ```
 
+# Callable vs Runnable
+Callables runs the asynchonous task and returns a value and can throw checked ecxeptions while Runnable only runs asynchronous task.
+
+```java
+public CallableEx implements Callable<String> {
+   @Override
+   public String call() throws Exception{ //For running it use executors or completablefuture
+      return "Callable";
+   }
+}
+
+public RunnableEx implements Runnable {
+   @Override
+   public void run() throws Exception{ //can use thread, completablefuture or executors both for running
+      System.out.println("Runnable");
+   }
+}
+```
+
 # What is volatile keyword
 Used to ensure visibility of variable when updated accross multiple threads. Thread cache the variables for performance which can lead to stale data issue. voltile makes sure that variable value is always read by main memory
 
